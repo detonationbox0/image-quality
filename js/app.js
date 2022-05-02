@@ -6,6 +6,8 @@ var tr;
 
 const outputWidth = 4500;
 const outputHeight = 6000;
+const outputWidthInches = 15; // Used for PPI calculations
+const outputHeightInches = 20; // Used for PPI calculations
 
 /**
  * -----------------------------------------------------------------------------------
@@ -506,6 +508,7 @@ $("#lq").on("click", function() {
  * */  
  $("#hq").on("click", function() {
     //#region
+    // addImage("high-quality.png");
     addImage("/image-quality/high-quality.png");
     
     //#endregion
@@ -518,6 +521,7 @@ $("#lq").on("click", function() {
  * */  
  $("#vec").on("click", function() {
     //#region
+    // addImage("vector.svg");
     addImage("/image-quality/vector.svg");
     
     //#endregion
@@ -676,7 +680,7 @@ function addImage(url) {
 
         imgNode.on('transform', function() {
 
-            console.log("Transforming...")
+            // console.log("Transforming...")
             printNodeData(imgNode);
 
             
@@ -722,23 +726,36 @@ function printNodeData(imgNode) {
         // var pI = (((finalNodeWidth - imgNode.width()) / Math.abs(imgNode.width())) * 100);
         var pI = (((finalNodeWidth - imgNode.width()) / Math.abs(imgNode.width())) * 100) + 100;
 
+        // PPI is the 'effective resolution' of the image and
+        // can be calculated with the pI (percentIncrease) variable
+        // I defined above. See more info here:
+        // https://www.askdesign.biz/blog/2013/08/effective-resolution-key-factor-of-image-scaling/
+        var ppi = (300 / pI) * 100;
+        console.log(`PPI: ${ppi}`);
+
 
         $("#statistics").text(`Original Width: ${imgNode.width()}
 Original Height: ${imgNode.height()}
 Width on Output: ${finalNodeWidth}
 Height on Output: ${finalNodeHeight}
 `);
-            
-        if (pI > 90 && pI < 100) {
-            $("#percentage-increase").text(`Percentage Increase: ${Math.round(pI)}%`).attr("class", "").addClass("close");
-        } else if (pI > 100 && pI < 110) {
+        // Conditional formatting for Percentage Increase:
+        if (pI > 400) {
+            $("#percentage-increase").text(`Percentage Increase: ${Math.round(pI)}`).attr("class", "").addClass("warn-hard");
+        } else if (pI > 250 && pI < 400) {
             $("#percentage-increase").text(`Percentage Increase: ${Math.round(pI)}%`).attr("class", "").addClass("light-warn");
-        } else if (pI > 110 && pI < 120) {
-            $("#percentage-increase").text(`Percentage Increase: ${Math.round(pI)}%`).attr("class", "").addClass("warn");
-        } else if (pI > 120) {
-            $("#percentage-increase").text(`Percentage Increase: ${Math.round(pI)}%`).attr("class", "").addClass("warn-hard"); 
         } else {
             $("#percentage-increase").text(`Percentage Increase: ${Math.round(pI)}%`).attr("class", "").addClass("good"); 
         }
+
+        // Conditional formatting for Effective PPI:
+        if (ppi < 75) {
+            $("#effective-ppi").text(`Quality: Poor (${Math.round(ppi)} PPI)`).attr("class", "").addClass("warn-hard");
+        } else if (ppi > 75 && ppi < 120) {
+            $("#effective-ppi").text(`Quality: Average (${Math.round(ppi)} PPI)`).attr("class", "").addClass("light-warn");
+        } else {
+            $("#effective-ppi").text(`Quality: Good: (${Math.round(ppi)} PPI)`).attr("class", "").addClass("good"); 
+        }
+
 
 }

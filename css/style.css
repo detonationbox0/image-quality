@@ -81,7 +81,7 @@ select {
     
 }
 
-#percentage-increase {
+#stats > p {
     font-weight:bold;
     margin-bottom:5px;
 }
